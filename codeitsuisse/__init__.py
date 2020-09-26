@@ -8,5 +8,6 @@ import codeitsuisse.routes.babylonOlympiad
 import codeitsuisse.routes.intelligentfarming
 import codeitsuisse.routes.socialdistancing
 import codeitsuisse.routes.magicalFruitBasket
+import codeitsuisse.routes.cluster
 
 
