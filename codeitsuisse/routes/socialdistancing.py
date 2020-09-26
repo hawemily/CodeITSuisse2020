@@ -15,7 +15,10 @@ def factorial(n):
     return factorial
 
 def spaces_arrangement(seats, num_spaces):
-    return factorial(seats+num_spaces-1) / (factorial(num_spaces-1)* factorial(seats))
+    if seats >= 0 and num_spaces >= 0:
+        return factorial(seats+num_spaces-1) / (factorial(num_spaces-1)* factorial(seats))
+    else:
+        return 0
   
 # def solve(seats, distancing, people):
 #     # for case where people at both ends
