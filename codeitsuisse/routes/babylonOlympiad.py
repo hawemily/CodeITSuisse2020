@@ -31,31 +31,30 @@ def findFirstIndexOfBookRequiringMoreThanTimetoComplete(time, books):
 
 def helper(timeRem, books, currIndex, currMax, memo, currList):
     if currIndex not in memo.keys():
-        if timeRem < 0:
-            index = currList.pop(len(currList) - 1)
-            memo[currIndex] = (currMax - 1, currList)
-        elif timeRem == 0 or currIndex == len(books) - 1:
+        if timeRem == 0 or currIndex == len(books) - 1:
             memo[currIndex] = (currMax, currList)
         else:
-            currList.append(currIndex)
-            (maxI, currListI) = helper(timeRem - books[currIndex], books, currIndex + 1,
+            if books[currIndex] <= timeRem:
+                currList.append(currIndex)
+                (maxI, currListI) = helper(timeRem - books[currIndex], books, currIndex + 1,
                                        currMax + 1, memo, currList)
-            logger.info("maxI " + str(maxI) + str(currListI))
-            logger.info("currIndex: " + str(currIndex))
-            (maxJ, currListJ) = helper(timeRem, books, currIndex + 1, currMax, memo, currList)
-            logger.info("maxJ " + str(maxJ) + str(currListJ))
-            if maxI > maxJ:
-                memo[currIndex] = (maxI, currListI)
+                logger.info("maxI " + str(maxI) + str(currListI))
+                logger.info("currIndex: " + str(currIndex))
+                (maxJ, currListJ) = helper(timeRem, books, currIndex + 1, currMax, memo, currList)
+                logger.info("maxJ " + str(maxJ) + str(currListJ))
+                if maxI > maxJ:
+                    memo[currIndex] = (maxI, currListI)
+                else:
+                    memo[currIndex] = (maxJ, currListJ)
+                logger.info("memo[currIndex]: " + str(memo[currIndex]))
             else:
-                memo[currIndex] = (maxJ, currListJ)
-        logger.info("memo[currIndex]: " + str(memo[currIndex]))
+                memo[currIndex] = (currMax, currList)
     return memo[currIndex]
 
 
 def findMaxBooksThatFitIntoTime(time, books, firstBookAboveTime):
     memo = {}
-    helper(time, books[:firstBookAboveTime], 0, 0, memo, [])
-    return memo[firstBookAboveTime - 1]
+    return helper(time, books[:firstBookAboveTime], 0, 0, memo, [])
 
 
 def findOptimalSolution(books, days):
