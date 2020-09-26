@@ -18,7 +18,7 @@ def evaluate_contact_tracing():
     cluster = data['cluster']
     result = contact_trace(origin, infected, cluster)
     logging.info("My result :{}".format(result))
-    return result
+    return str(result)
 
 
 # determine if mutation is silent or not, also return number of differences
@@ -67,6 +67,8 @@ def find_closest_mutation(infected, cluster):
     is_non_silent = False
     smallestDiffCluster = {}
     for i in range(len(cluster)):
+        logging.info("evaluate mutation")
+        logging.info(i)
         (is_non_silent_mutation, diff) = eval_mutation(infected, cluster[i])
         if smallestDiff > diff:
             smallestDiff = diff
@@ -74,7 +76,8 @@ def find_closest_mutation(infected, cluster):
             smallestDiffCluster = cluster[i]
         if diff == 0:
             break
-
+    logging.info("smallest diff cluster:")
+    logging.info(smallestDiffCluster)
     return smallestDiffCluster, is_non_silent, smallestDiff
 
 
@@ -83,7 +86,9 @@ def init_dict_of_closest_cluster(closest_cluster_btw_one_another, cluster):
     for i in range(len(cluster)):
         (clusterMutation, is_non_silent_cluster, smallestDiff) = find_closest_mutation(prev_cluster_elem,
                                                                                        cluster[i + 1:])
-        closest_cluster_btw_one_another[cluster[i]["name"]] = [clusterMutation['name'], is_non_silent_cluster]
+        if clusterMutation == {}:
+            return
+        closest_cluster_btw_one_another[cluster[i]["name"]] = [clusterMutation["name"], is_non_silent_cluster]
 
 
 def find_cluster_from_clusters(prev_closest_cluster, cluster):
@@ -94,6 +99,7 @@ def find_cluster_from_clusters(prev_closest_cluster, cluster):
 
 def contact_trace(origin, infected, cluster):
     trace_array = []
+    logging.info("contact_trace")
     s = ""
     (is_non_silent_origin, diff_infected_origin) = eval_mutation(infected, origin)
     if len(cluster) == 0:
@@ -108,37 +114,50 @@ def contact_trace(origin, infected, cluster):
         elif diff_infected_origin == smallestDiff:
             s = create_string(s, is_non_silent_origin, origin, infected)
             trace_array.append(s)
-            clusterStr = create_string(s, is_non_silent_cluster, closestClusterToInfected, infected)
+            logging.info("trace array:")
+            logging.info(trace_array)
+            clusterStr = create_string("", is_non_silent_cluster, closestClusterToInfected, infected)
+            logging.info("closest cluster to infected: ")
+            logging.info(closestClusterToInfected)
+            logging.info("Clusterst:")
+            logging.info(clusterStr)
             init_dict_of_closest_cluster(closest_cluster_btw_one_another, cluster)
-            (next_closest_cluster_infection_name, non_silent) = closest_cluster_btw_one_another[
-                closestClusterToInfected["name"]]
-            while next_closest_cluster_infection_name is not None:
-                if non_silent:
-                    clusterStr += "*"
-                clusterStr += " -> "
-                clusterStr += next_closest_cluster_infection_name
-                (next_closest_cluster_infection_name, non_silent) = closest_cluster_btw_one_another[
-                    closestClusterToInfected[next_closest_cluster_infection_name]]
+            if closestClusterToInfected != {}:
+                if closestClusterToInfected["name"] in closest_cluster_btw_one_another.keys():
+                    (next_closest_cluster_infection_name, non_silent) = closest_cluster_btw_one_another[
+                        closestClusterToInfected["name"]]
+                    while closestClusterToInfected[next_closest_cluster_infection_name] in closest_cluster_btw_one_another.keys():
+                        if non_silent:
+                            clusterStr += "*"
+                        clusterStr += " -> "
+                        clusterStr += next_closest_cluster_infection_name
+                        (next_closest_cluster_infection_name, non_silent) = closest_cluster_btw_one_another[
+                            closestClusterToInfected[next_closest_cluster_infection_name]]
             trace_array.append(clusterStr)
         else:
             init_dict_of_closest_cluster(closest_cluster_btw_one_another, cluster)
-            clusterStr = create_string(s, is_non_silent_cluster, closestClusterToInfected, infected)
-            (next_closest_cluster_infection_name, non_silent) = closest_cluster_btw_one_another[
-                closestClusterToInfected["name"]]
-            prev_closest_cluster_name = next_closest_cluster_infection_name
-            while next_closest_cluster_infection_name is not None:
+            clusterStr = create_string("", is_non_silent_cluster, closestClusterToInfected, infected)
+            if closestClusterToInfected != {}:
+                prev_closest_cluster_name = closestClusterToInfected["name"]
+                if closestClusterToInfected["name"] in closest_cluster_btw_one_another.keys():
+                    (next_closest_cluster_infection_name, non_silent) = closest_cluster_btw_one_another[
+                        closestClusterToInfected["name"]]
+                    prev_closest_cluster_name = next_closest_cluster_infection_name
+                    while next_closest_cluster_infection_name is not None:
+                        if non_silent:
+                            clusterStr += "*"
+                        clusterStr += " -> "
+                        clusterStr += next_closest_cluster_infection_name
+                        prev_closest_cluster_name = next_closest_cluster_infection_name
+                        (next_closest_cluster_infection_name, non_silent) = closest_cluster_btw_one_another[
+                            closestClusterToInfected[next_closest_cluster_infection_name]]
+                prev_cluster = find_cluster_from_clusters(prev_closest_cluster_name, cluster)
+                (_, non_silent) = eval_mutation(prev_cluster, origin)
+                logging.info("origin printing")
                 if non_silent:
                     clusterStr += "*"
                 clusterStr += " -> "
-                clusterStr += next_closest_cluster_infection_name
-                prev_closest_cluster_name = next_closest_cluster_infection_name
-                (next_closest_cluster_infection_name, non_silent) = closest_cluster_btw_one_another[
-                    closestClusterToInfected[next_closest_cluster_infection_name]]
-            prev_cluster = find_cluster_from_clusters(prev_closest_cluster_name)
-            (_, non_silent) = eval_mutation(prev_cluster, origin)
-            if non_silent:
-                clusterStr += "*"
-            clusterStr += " -> "
-            clusterStr += origin["name"]
+                clusterStr += origin["name"]
+            trace_array.append(clusterStr)
 
     return trace_array
