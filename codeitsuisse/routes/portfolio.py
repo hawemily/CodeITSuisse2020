@@ -25,6 +25,7 @@ def portfolio():
             contract_size = future["IndexFuturePrice"] * future["Notional"]
             num_contracts = hedge_ratio * portfolio["Value"] / contract_size
             calculated[portfolio["Name"]][future["Name"]] = {
+                "FuturePrcVol": future["FuturePrcVol"],
                 "HedgePositionName": future["Name"],
                 "OptimalHedgeRatio": round(hedge_ratio, 3),
                 "NumFuturesContract": math.ceil(num_contracts)
@@ -35,12 +36,26 @@ def portfolio():
         ]
     }
     for output in calculated.values():
-        optimal = 1
+        optimal_ratio = 1
+        optimal_volatility = 99999999999999999
+        sol_ratio = None
+        sol_ratio = None
         sol = None
         for future in output.values():
-            if future["OptimalHedgeRatio"] < optimal:
-                optimal = future["OptimalHedgeRatio"]
-                sol = future
+            if future["OptimalHedgeRatio"] < optimal_ratio:
+                optimal_ratio = future["OptimalHedgeRatio"]
+                sol_ratio = future
+            if future["FuturePrcVol"] < optimal_volatility:
+                optimal_volatility = future["FuturePrcVol"]
+                sol_volatility = future
+        if sol_ratio != sol_volatility:
+            if sol_ratio["NumFuturesContract"] < sol_volatility["NumFuturesContract"]:
+                sol = sol_ratio
+            else:
+                sol = sol_volatility
+        else:
+            sol = sol_ratio
+        sol.pop("FuturePrcVol", None)
         result["outputs"].append(sol)
             
             
