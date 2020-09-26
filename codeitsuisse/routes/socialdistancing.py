@@ -81,6 +81,7 @@ def social_distance():
         seats = v["seats"]
         people = v["people"]
         spaces = v["spaces"]
+
         # logging.info("ref: {}".format(spaces_arrangement(seats - people - spaces * (people - 1), people)))
         # case if people seating at both ends
         result += spaces_arrangement(seats - people - spaces * (people - 1), people - 1)
