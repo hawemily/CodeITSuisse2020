@@ -25,4 +25,4 @@ if __name__ == "__main__":
     # port = sock.getsockname()[1]
     port = 3000
     sock.close()
-    app.run(port=port)
+    app.run(port=5000)
