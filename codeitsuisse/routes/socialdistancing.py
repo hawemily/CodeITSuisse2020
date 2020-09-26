@@ -15,8 +15,10 @@ def factorial(n):
     return factorial
 
 def spaces_arrangement(seats, num_spaces):
-    if seats >= 0 and num_spaces >= 0:
+    if seats > 0 and num_spaces > 0:
         return factorial(seats+num_spaces-1) / (factorial(num_spaces-1)* factorial(seats))
+    elif seats == 0:
+        return 1
     else:
         return 0
   
@@ -79,6 +81,7 @@ def social_distance():
         seats = v["seats"]
         people = v["people"]
         spaces = v["spaces"]
+
         # logging.info("ref: {}".format(spaces_arrangement(seats - people - spaces * (people - 1), people)))
         # case if people seating at both ends
         result += spaces_arrangement(seats - people - spaces * (people - 1), people - 1)
