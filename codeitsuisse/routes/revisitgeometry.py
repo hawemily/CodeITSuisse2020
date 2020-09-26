@@ -30,19 +30,7 @@ def line_intersection(line1, line2):
     min_y = min(line1[0][1], line1[1][1])
     max_y = max(line1[0][1], line1[1][1])
     if (min_x <= x <= max_x and min_y <= y <= max_y) :
-        logging.info(str(x))
-        logging.info(str(y))
-        if (len(str(x).split(".")[1]) > 1):
-            x = round(x, 2)
-            logging.info(x)
-        else:
-            x = int(x)
-        if (len(str(y).split(".")[1]) > 1):
-            y = round(y, 2)
-            logging.info(y)
-        else: 
-            y = int(y)
-        return x, y
+        return round(x, 2), round(y, 2)
     else:
         return None, None
 
