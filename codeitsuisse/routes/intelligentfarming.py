@@ -103,4 +103,15 @@ def farming():
     result = data
     result["list"][0]["geneSequence"] = sorted_string
     logging.info("My result :{}".format(result))
-    return json.dumps(result)
+    return jsonify(result)
+
+
+# {
+#     "runId": "a",
+#     "list": [
+#         {
+#             "id": 1,
+#             "geneSequence": "AAAAAACCTTTGGGGGGGTTTT"
+#         }
+#     ]
+# }
