@@ -13,11 +13,13 @@ def evaluate_fruit_basket():
     data = request.get_json();
     logging.info("data sent for evaluation {}".format(data))
     fruits = []
+    if data == {}:
+        return json.dumps("0")
     for (k, v) in data.items():
         fruits.append(v)
     result = guessFruitWeight(fruits)
     logging.info("My result :{}".format(result))
-    return json.dumps(result);
+    return json.dumps(result)
 
 
 def guessFruitWeight(fruits):
