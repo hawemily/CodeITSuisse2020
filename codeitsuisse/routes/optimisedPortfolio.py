@@ -27,7 +27,7 @@ def evaluate_portfolio():
     outputs = {"outputs": ls}
 
     logging.info("My result :{}".format(outputs))
-    return json.dumps(outputs)
+    return json.dumps(outputs, cls=DecimalEncoder)
 
 
 def calculateLowestHedge(indexFutures, value, spotPrcSD):
@@ -37,11 +37,19 @@ def calculateLowestHedge(indexFutures, value, spotPrcSD):
     for indexFuture in indexFutures:
         hedgeRatio = Decimal(str(indexFuture["CoRelationCoefficient"] * spotPrcSD / indexFuture["FuturePrcVol"]))
         roundedHedgeRatio = round(hedgeRatio, 3)
+        logger.info("rounderhedgeratio typee: " + str(type(roundedHedgeRatio)))
         futuresContract = Decimal(
-            str(roundedHedgeRatio * value / (indexFuture["IndexFuturePrice"] * indexFuture["Notional"])))
+            str(roundedHedgeRatio * value / Decimal(str((indexFuture["IndexFuturePrice"] * indexFuture["Notional"])))))
         roundFutureContract = int(round(futuresContract))
         if lowestFutures > roundFutureContract:
             lowestFutures = roundFutureContract
             lowestHR = roundedHedgeRatio
             lowestFut = indexFuture["Name"]
     return lowestFut, lowestHR, lowestFutures
+
+
+class DecimalEncoder(json.JSONEncoder):
+    def default(self, o):
+        if isinstance(o, Decimal):
+            return float(o)
+        return super(DecimalEncoder, self).default(o)
