@@ -110,4 +110,5 @@ def evaluate_cluster():
     logging.info(type(data))
     result = countNoOfClusters(data)
     logging.info("My result :{}".format(result))
-    return json.dumps(result)
+    formattedResult = {"answer": result}
+    return json.dumps(formattedResult)
