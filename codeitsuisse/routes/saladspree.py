@@ -39,7 +39,7 @@ def saladspree():
                     if spent == 0 or cost < spent:
                         spent = cost
 
-    result = spent
+    result = {"result": spent}
     logging.info("My result :{}".format(result))
     return json.dumps(result);
 
