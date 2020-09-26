@@ -23,7 +23,16 @@ def line_intersection(line1, line2):
     d = (det(*line1), det(*line2))
     x = det(d, xdiff) / div
     y = det(d, ydiff) / div
-    return round(x, 2), round(y, 2)
+
+    # check bounds
+    min_x = min(line1[0][0], line1[1][0])
+    max_x = max(line1[0][0], line1[1][0])
+    min_y = min(line1[0][1], line1[1][1])
+    max_y = max(line1[0][1], line1[1][1])
+    if (min_x <= x <= max_x and min_y <= y <= max_y) :
+        return round(x, 2), round(y, 2)
+    else:
+        return None, None
 
 @app.route('/revisitgeometry', methods=['POST'])
 def geometry():
